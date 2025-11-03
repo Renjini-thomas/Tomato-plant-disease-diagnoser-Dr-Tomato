@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tomato Leaf Disease Predictor | Ensemble Model</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <div style="position: absolute; top: 20px; right: 20px;">
+    <a href="/" style="color: white; text-decoration: none; background: var(--primary); padding: 8px 15px; border-radius: 5px;">
+        <i class="fas fa-home"></i> Back to Home
+    </a>
+</div>
+  <style>
+    /* ===== Global Reset ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --primary: #014d08;
+      --primary-light: #024511;
+      --secondary: #28a745;
+      --secondary-dark: #1e7e34;
+      --accent: #ff6b6b;
+      --light: #f8f9fa;
+      --dark: #343a40;
+      --gray: #6c757d;
+      --success: #28a745;
+      --warning: #ffc107;
+      --danger: #dc3545;
+      --info: #17a2b8;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: url('static/images/tomato3.png') no-repeat center center fixed;
+      /* background: linear-gradient(135deg, var(--primary), var(--primary-light)); */
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /* overflow: hidden; */
+      color: var(--dark);
+    }
+
+    /* ===== Main Container ===== */
+    .container {
+      background-color: #ffffff;
+      width: 95%;
+      max-width: 1100px;
+      height: 90vh;
+      border-radius: 20px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ===== Header ===== */
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2.5rem;
+      color: var(--secondary);
+    }
+
+    .logo-text h1 {
+      color: var(--primary);
+      font-weight: 700;
+      font-size: 1.8rem;
+      line-height: 1.2;
+    }
+
+    .logo-text p {
+      color: var(--gray);
+      font-size: 0.9rem;
+    }
+
+    .model-info {
+      background: rgba(40, 167, 69, 0.1);
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      color: var(--secondary);
+      font-weight: 500;
+    }
+
+    /* ===== Main Content ===== */
+    .main-content {
+      display: flex;
+      flex: 1;
+      gap: 30px;
+      overflow: hidden;
+    }
+
+    /* ===== Left Panel ===== */
+    .left-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ===== Upload Section ===== */
+    .upload-section {
+      border: 2px dashed var(--primary);
+      padding: 25px;
+      border-radius: 12px;
+      background-color: #f9fbff;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .upload-section:hover {
+      background-color: #eef5ff;
+      border-color: var(--primary-light);
+    }
+
+    .upload-icon {
+      font-size: 3rem;
+      color: var(--primary);
+      margin-bottom: 15px;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    label.file-label {
+      background-color: var(--primary);
+      color: white;
+      padding: 12px 28px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      display: inline-block;
+      margin-bottom: 15px;
+    }
+
+    label.file-label:hover {
+      background-color: var(--primary-light);
+      transform: translateY(-2px);
+    }
+
+    #fileNameDisplay {
+      color: var(--gray);
+      font-style: italic;
+      margin-bottom: 10px;
+    }
+
+    .file-requirements {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+
+    /* ===== Preview Section ===== */
+    .preview-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background: var(--light);
+    }
+
+    .preview-header {
+      background: var(--primary);
+      color: white;
+      padding: 10px 15px;
+      font-weight: 500;
+    }
+
+    .preview-content {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 15px;
+      overflow: hidden;
+    }
+
+    #image-preview {
+      max-width: 100%;
+      max-height: 100%;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+      display: none;
+    }
+
+    .preview-placeholder {
+      color: var(--gray);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .preview-placeholder i {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: var(--gray);
+    }
+
+    /* ===== Right Panel ===== */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* ===== Result Section ===== */
+    .result-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      background: var(--light);
+    }
+
+    .result-header {
+      background: var(--primary);
+      color: white;
+      padding: 10px 15px;
+      font-weight: 500;
+    }
+
+    .result-content {
+      flex: 1;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .result-placeholder {
+      color: var(--gray);
+      text-align: center;
+      padding: 20px;
+    }
+
+    .result-placeholder i {
+      font-size: 3rem;
+      margin-bottom: 10px;
+      color: var(--gray);
+    }
+
+    .prediction-result {
+      text-align: center;
+    }
+
+    .disease-name {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--secondary);
+      margin: 15px 0;
+    }
+
+    .confidence {
+      display: inline-block;
+      background: rgba(40, 167, 69, 0.1);
+      color: var(--secondary);
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+
+    .disease-info {
+      text-align: left;
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      margin-top: 15px;
+    }
+
+    .disease-info h3 {
+      color: var(--primary);
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      padding-bottom: 5px;
+    }
+
+    /* ===== Action Section ===== */
+    .action-section {
+      display: flex;
+      gap: 15px;
+    }
+
+    button {
+      flex: 1;
+      padding: 14px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .predict-btn {
+      background-color: var(--secondary);
+      color: white;
+    }
+
+    .predict-btn:hover {
+      background-color: var(--secondary-dark);
+      transform: translateY(-2px);
+    }
+
+    .reset-btn {
+      background-color: var(--light);
+      color: var(--dark);
+      border: 1px solid var(--gray);
+    }
+
+    .reset-btn:hover {
+      background-color: #e9ecef;
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none !important;
+    }
+
+    /* ===== Footer ===== */
+    .app-footer {
+      margin-top: 20px;
+      padding-top: 15px;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      text-align: center;
+      color: var(--gray);
+      font-size: 0.85rem;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .container {
+        height: auto;
+        padding: 20px;
+        max-height: 95vh;
+      }
+      
+      .main-content {
+        flex-direction: column;
+        gap: 20px;
+      }
+      
+      .app-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 10px;
+      }
+      
+      .logo {
+        justify-content: center;
+      }
+      
+      .action-section {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="app-header">
+      <div class="logo">
+        <div class="logo-icon">
+          <i class="fas fa-leaf"></i>
+        </div>
+        <div class="logo-text">
+          <h1>🍅Dr. Tomato</h1>
+          <p><b>AI-powered tomato plant health diagnoser</b></p>
+        </div>
+      </div>
+      <div class="model-info">
+        <i class="fas fa-brain"></i> Ensemble Model
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <!-- Left Panel -->
+      <div class="left-panel">
+        <!-- Upload Section -->
+        <div class="upload-section">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <input type="file" id="imageInput" accept="image/*">
+          <label for="imageInput" class="file-label">
+            <i class="fas fa-folder-open"></i> Choose Tomato Leaf Image
+          </label>
+          <p id="fileNameDisplay">No file selected</p>
+          <p class="file-requirements">Supported formats: JPG, PNG, JPEG | Max size: 5MB</p>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="preview-section">
+          <div class="preview-header">
+            <i class="fas fa-image"></i> Image Preview
+          </div>
+          <div class="preview-content">
+            <img id="image-preview" src="#" alt="Image Preview">
+            <div class="preview-placeholder" id="previewPlaceholder">
+              <i class="far fa-image"></i>
+              <p>Your image will appear here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div class="right-panel">
+        <!-- Result Section -->
+        <div class="result-section">
+          <div class="result-header">
+            <i class="fas fa-clipboard-list"></i> Diagnosis Results
+          </div>
+          <div class="result-content" id="result">
+            <div class="result-placeholder">
+              <i class="fas fa-stethoscope"></i>
+              <p>Results will appear here after analysis</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Section -->
+        <div class="action-section">
+          <button class="predict-btn" onclick="uploadImage()">
+            <i class="fas fa-search"></i> Get Diagnosis
+          </button>
+          <button class="reset-btn" onclick="resetApp()">
+            <i class="fas fa-redo"></i> Reset
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="app-footer">
+      <p>Tomato Disease Diagnoser &copy; 2025 | Powered by Ensemble AI Model</p>
+    </div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById('imageInput');
+    const resultDiv = document.getElementById('result');
+    const imagePreview = document.getElementById('image-preview');
+    const fileNameDisplay = document.getElementById('fileNameDisplay');
+    const previewPlaceholder = document.getElementById('previewPlaceholder');
+    const predictButton = document.querySelector('.predict-btn');
+    const resetButton = document.querySelector('.reset-btn');
+
+    // Display preview and filename
+    imageInput.onchange = evt => {
+      const [file] = imageInput.files;
+      if (file) {
+        // Check file size (5MB limit)
+        if (file.size > 5 * 1024 * 1024) {
+          alert('File size exceeds 5MB limit. Please choose a smaller image.');
+          resetApp();
+          return;
+        }
+        
+        imagePreview.src = URL.createObjectURL(file);
+        imagePreview.style.display = 'block';
+        previewPlaceholder.style.display = 'none';
+        fileNameDisplay.textContent = file.name;
+        resultDiv.innerHTML = '<div class="result-placeholder"><i class="fas fa-check-circle" style="color:var(--success)"></i><p>Image ready for analysis</p></div>';
+      } else {
+        resetApp();
+      }
+    }
+
+    function uploadImage() {
+      const file = imageInput.files[0];
+      if (!file) {
+        resultDiv.innerHTML = '<div class="result-placeholder"><i class="fas fa-exclamation-triangle" style="color:var(--danger)"></i><p>Please select an image file first</p></div>';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+      predictButton.disabled = true;
+      resultDiv.innerHTML = '<div class="result-placeholder"><i class="fas fa-spinner fa-spin" style="color:var(--primary)"></i><p>Analyzing image, please wait...</p></div>';
+
+      fetch('/predict', {
+        method: 'POST',
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+  predictButton.disabled = false;
+  if (data.success) {
+    resultDiv.innerHTML = `
+      <div class="prediction-result">
+        <p style="color:#333; font-weight:500;">Diagnosis for <b>${data.filename}</b>:</p>
+        <p class="disease-name">Disease: ${data.prediction}</p>
+        <p class="disease-name">Confidence Score: ${data.confidence}</p>
+        <div class="disease-info">
+          <h3><i class="fas fa-leaf"></i> Remedies</h3>
+          <p style="white-space: pre-line;">${data.remedy}</p>
+        </div>
+      </div>
+    `;
+  } else {
+    resultDiv.innerHTML = `<p style="color:red;">❌ Prediction Failed: ${data.error}</p>`;
+  }
+})
+      .catch(error => {
+        predictButton.disabled = false;
+        resultDiv.innerHTML = `<p style="color:red;">⚠️ Network/Server Error: ${error}</p>`;
+      });
+    }
+
+    function resetApp() {
+      imageInput.value = '';
+      imagePreview.style.display = 'none';
+      previewPlaceholder.style.display = 'flex';
+      fileNameDisplay.textContent = 'No file selected';
+      resultDiv.innerHTML = '<div class="result-placeholder"><i class="fas fa-stethoscope"></i><p>Results will appear here after analysis</p></div>';
+      predictButton.disabled = false;
+    }
+  </script>
+
+</body>
+</html>
