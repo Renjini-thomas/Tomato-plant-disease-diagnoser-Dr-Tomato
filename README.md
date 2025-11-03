@@ -17,10 +17,11 @@ For Software:
 - LLM integration - Ollama (phi3)
 
 # Screenshots 
-![screenshot 1](<>)
+![screenshot 1](<Screenshot 2025-10-26 120431.png>)
 This is the home page of the web app.
 
-!![screenshot 2](<>)
+!![screenshot 2](<Screenshot 2025-10-26 120449.png>)
 The image uploading page.
 
-!![screenshot 3](<>)
+!![screenshot 3](<Screenshot 2025-10-26 123440.png>)
+
