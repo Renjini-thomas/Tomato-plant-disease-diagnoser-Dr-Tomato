@@ -1,4 +1,4 @@
-# 🍅Dr Toamto 🌿🤖
+# 🍅Dr Tomato 🌿🤖
 ## AI-Powered Tomato Plant Disease Diagnoser
 
 ### Dr. Tomato is an intelligent deep learning–based web app that diagnoses tomato leaf diseases from uploaded images and provides organic and chemical treatment suggestions using a local LLM (phi-3 via Ollama).
@@ -24,4 +24,5 @@ This is the home page of the web app.
 The image uploading page.
 
 !![screenshot 3](<Screenshot 2025-10-26 123440.png>)
+
 
